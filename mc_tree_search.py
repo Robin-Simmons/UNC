@@ -27,7 +27,6 @@ def rollout(roll_node):
     
    
     game_cont = True
-    i = 0
     while game_cont == True:
         if rollout_game.meta_board[sub_game[0], sub_game[1]] != 0:
             allowed_games  = np.argwhere(rollout_game.meta_board == 0)
@@ -41,7 +40,6 @@ def rollout(roll_node):
         game_cont, winner = rollout_game.iterate_rollout(move, sub_game)
         sub_game = move
         
-    print(winner)
     return winner
 
 
@@ -71,16 +69,17 @@ def create_tree(game):
             ancestor.t = score
         ucb[arg] = UCB(root.children[arg].t, root.children[arg].n, root.children[arg].parent.n)
         
-    print(ucb)
+    return np.fromstring(root.children[np.argmax(ucb)].name, sep = ",")
 #X is player
 #O is AI
 #X starts
 game = main.game()
 main.drawboard(game)
-for i in range(2):
+for i in range(20):
     if game.player == 1:
         game.iterate_game()
-        main.drawboard(game)
     else:
-        create_tree(game)
-    
+        move = create_tree(game).astype(int)
+        print(move)
+        game.iterate_ai(move, game.last_move)
+    main.drawboard(game)

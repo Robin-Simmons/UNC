@@ -106,6 +106,39 @@ class game:
            self.last_move = move
            return True
        
+    def iterate_ai(self, move, sub_game):
+        self.board[int(sub_game[0]*3 + move[0]), int(sub_game[1]*3 + move[1])] = self.player
+
+        #checks sub board thats just been played to see if it has been won or drawn
+        sub_board = self.board[sub_game[0]*3:sub_game[0]*3+3, sub_game[1]*3:sub_game[1]*3+3]
+        #updates meta board with with any new wins/draws
+        board_win_state = self.check_game_won(sub_board)
+        self.meta_board[sub_game[0],sub_game[1]] = board_win_state
+        # if the subgame was drawn or won, set the next move to be a free one
+        if board_win_state != 0:
+            move = np.array([np.nan, np.nan])
+            
+        #checks if the total game has been won/drawn
+        game_win_state = self.check_game_won(self.meta_board)
+        if game_win_state == self.player:
+            print("Player {} wins".format(player_str(self.player)))
+            return False
+        elif np.isnan(game_win_state) == True:
+            print("Game is draw")
+            game_sum = np.sum(self.meta_board)
+            if game_sum > 0:
+                print("Player X controls the board")
+            elif game_sum < 0:
+                print("Player O controls the board")
+            else:
+                print("No one controls the board")
+            return False
+        else:
+           #iterate the player and last move
+           self.player = -1*self.player
+           self.last_move = move
+           return True
+       
     def iterate_rollout(self, move, sub_game):
     
         #checks sub board thats just been played to see if it has been won or drawn
